@@ -42,12 +42,25 @@ jobs:
           export PATH=~/bin:$PATH
           mkdir ~/android
           cd ~/android
-          repo init -u https://android.googlesource.com/platform/manifest -b android-11.0.0_r43
-          cd .repo
-          git clone https://github.com/sonyxperiadev/local_manifests
-          cd local_manifests
-          git checkout android-11.0.0_r43
-          cd ../..
-          repo sync
-          ./repo_update.sh
+          repo init -u git://github.com/LineageOS/android.git -b lineage-18.1
+          mkdir .repo/local_manifests
+          echo "
+
+  <?xml version="1.0" encoding="UTF-8"?>
+  <manifest>
+      <!-- SONY -->
+      <project name="whatawurst/android_kernel_sony_msm8998" path="kernel/sony/msm8998" remote="github" revision="lineage-18.1" />
+      <project name="whatawurst/android_device_sony_yoshino-common" path="device/sony/yoshino-common" remote="github" revision="lineage-18.1" />
+      <project name="whatawurst/android_device_sony_maple_dsds" path="device/sony/maple_dsds" remote="github" revision="lineage-18.1" />
+
+      <!-- Pinned blobs for poplar -->
+      <project name="whatawurst/android_vendor_sony_maple_dsds" path="vendor/sony/maple_dsds" remote="github" revision="lineage-18.1" />
+  </manifest>
+">> roomservice.xml
+
+        repo sync
+        
+        source build/envsetup.sh
+        lunch lineage_maple_dsds-userdebug
+        make -j8 bacon
           
